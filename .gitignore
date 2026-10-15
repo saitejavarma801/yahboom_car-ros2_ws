@@ -1,0 +1,19 @@
+# ROS 2 generated files
+build/
+install/
+log/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# IDE and OS files
+.vscode/
+.idea/
+.DS_Store
+
+# Large data files (uncomment if needed)
+# *.bag
+# *.db3
