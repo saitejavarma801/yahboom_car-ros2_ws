@@ -288,4 +288,4 @@ Upstream Slamtec driver, version 2.1.4. The bring-up passes `channel_type`, `ser
 
 ## micro_ros_agent
 
-Upstream micro-ROS Agent 3.0.6. It is started with `udp4 -p 8888 -v6`: UDP over IPv4 on port 8888, verbosity 6. Microcontroller clients must be set to the Jetson's IP address and port 8888, and use the same `ROS_DOMAIN_ID`. Building it pulls Micro-XRCE-DDS from the internet through a CMake superbuild. See [Setup](setup-and-build.md).
+Upstream micro-ROS Agent 3.0.6. It is started with `udp4 -p 8888 -v6`: UDP over IPv4 on port 8888, verbosity 6. Microcontroller clients must be set to the Jetson's IP address and port 8888, and use the same `ROS_DOMAIN_ID`. When it is started by hand as `micro_ros_agent udp4 --port 8888 --dev <ip>`, the `--dev` option is ignored: it only applies to the serial and CAN transports, and the UDP agent always listens on all interfaces. See [Operation §5](operation.md#5-field-bring-up-the-five-terminal-sequence). Building it pulls Micro-XRCE-DDS from the internet through a CMake superbuild. See [Setup](setup-and-build.md).

@@ -70,25 +70,26 @@ These are defects or gaps in the current code that affect how the robot behaves.
 
 ### Hardware interface and drivers
 
-10. **Shared `/dev/ttyUSB0`.** `read_write_node` hard-codes `/dev/ttyUSB0`, which `rashwan.launch.py` and `new.launch.py` also use for the LiDAR. *Fix:* udev symlinks, and make `DEVICE_NAME` a ROS parameter.
-11. **Disabling torque on exit drops the arm.** `read_write_node` disables torque at shutdown.
-12. **Wrong log messages.** `read_write_node` logs "Profile Velocity to 5000 / Acceleration to 7000", but writes 500 / 700.
-13. **`servo_controller` re-creates `GPIO.PWM` objects on every message** and never calls `stop()`/`cleanup()`. Depending on the GPIO library version, repeated commands can raise "PWM object already exists" or leak channels. *Fix:* create one PWM object per pin in `__init__` and reuse it.
-14. **`use_mock_hardware` launch argument has no effect.** It is not forwarded to xacro.
-15. **The ODrive plugin does not report errors.** If an axis disarms (for example on undervoltage), ROS is not told. This is an upstream limitation.
+10. **Duplicate nodes in the five-terminal field sequence.** `robot_localization_launch.launch.py` also starts `read_write_node` and `micro_ros_agent`. If they were already started by hand, the second agent fails to bind UDP 8888 (harmless). The second `read_write_node` shares `/dev/ttyUSB0` with the first, so commands are written twice, packets collide, and either copy cuts arm torque when it exits. *Fix:* start each node only once (see [Operation §5](operation.md#-duplicates-with-the-launch-file)).
+11. **Shared `/dev/ttyUSB0`.** `read_write_node` hard-codes `/dev/ttyUSB0`, which `rashwan.launch.py` and `new.launch.py` also use for the LiDAR. *Fix:* udev symlinks, and make `DEVICE_NAME` a ROS parameter.
+12. **Disabling torque on exit drops the arm.** `read_write_node` disables torque at shutdown.
+13. **Wrong log messages.** `read_write_node` logs "Profile Velocity to 5000 / Acceleration to 7000", but writes 500 / 700.
+14. **`servo_controller` re-creates `GPIO.PWM` objects on every message** and never calls `stop()`/`cleanup()`. Depending on the GPIO library version, repeated commands can raise "PWM object already exists" or leak channels. *Fix:* create one PWM object per pin in `__init__` and reuse it.
+15. **`use_mock_hardware` launch argument has no effect.** It is not forwarded to xacro.
+16. **The ODrive plugin does not report errors.** If an axis disarms (for example on undervoltage), ROS is not told. This is an upstream limitation.
 
 ### Configuration
 
-16. `nav2_params.yaml`: `robot_radius: 0.22` is smaller than the 0.658 × 0.488 m chassis.
-17. `nav2_params.yaml` `bt_navigator.odom_topic: /odom`, but the controller publishes `/botwheel_explorer/odom`. Only TF is used for core navigation, but BT nodes that read odometry will see nothing. *Fix:* set it to `/botwheel_explorer/odom`.
-18. `controller_manager.update_rate: 10` Hz limits drive responsiveness and odometry rate.
-19. `localization_launch.py` default map `map_5.yaml` and the slam localization `map_file_name: map_4` are not in the repository.
-20. `scan_mode` is declared in several launch files but never passed to `rplidar_node`.
-21. `rashwan_gazebo.xacro` refers to `left_wheel_joint` / `right_wheel_joint`, which do not exist in the Rashwan URDF, so the Gazebo simulation will not drive.
-22. `robot_state_publisher` is given a `cmd_vel` remap, which does nothing (it was copied from the upstream example).
-23. Package metadata (`package.xml` descriptions, licences, and the dependencies of the Python packages) is still at the `TODO` defaults, so `rosdep` cannot install their runtime dependencies (`apriltag`, `cv_bridge`, `Jetson.GPIO`, `nav2_msgs`, …).
+17. `nav2_params.yaml`: `robot_radius: 0.22` is smaller than the 0.658 × 0.488 m chassis.
+18. `nav2_params.yaml` `bt_navigator.odom_topic: /odom`, but the controller publishes `/botwheel_explorer/odom`. Only TF is used for core navigation, but BT nodes that read odometry will see nothing. *Fix:* set it to `/botwheel_explorer/odom`.
+19. `controller_manager.update_rate: 10` Hz limits drive responsiveness and odometry rate.
+20. `localization_launch.py` default map `map_5.yaml` and the slam localization `map_file_name: map_4` are not in the repository.
+21. `scan_mode` is declared in several launch files but never passed to `rplidar_node`.
+22. `rashwan_gazebo.xacro` refers to `left_wheel_joint` / `right_wheel_joint`, which do not exist in the Rashwan URDF, so the Gazebo simulation will not drive.
+23. `robot_state_publisher` is given a `cmd_vel` remap, which does nothing (it was copied from the upstream example).
+24. Package metadata (`package.xml` descriptions, licences, and the dependencies of the Python packages) is still at the `TODO` defaults, so `rosdep` cannot install their runtime dependencies (`apriltag`, `cv_bridge`, `Jetson.GPIO`, `nav2_msgs`, …).
 
 ### Repository
 
-24. The repository name says "yahboom_car", but the code is for the custom ODrive-based "Rashwan" robot.
-25. Large third-party trees (`ros-controls/`, `rplidar_ros/sdk`, `DynamixelSDK`) are vendored as plain source, not as submodules or a `.repos` file. That makes upstream updates and diffs against upstream hard. Consider a `vcs import` file plus a small set of patches for the modified DynamixelSDK files.
+25. The repository name says "yahboom_car", but the code is for the custom ODrive-based "Rashwan" robot.
+26. Large third-party trees (`ros-controls/`, `rplidar_ros/sdk`, `DynamixelSDK`) are vendored as plain source, not as submodules or a `.repos` file. That makes upstream updates and diffs against upstream hard. Consider a `vcs import` file plus a small set of patches for the modified DynamixelSDK files.

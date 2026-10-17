@@ -124,7 +124,7 @@ The two servos face each other, so "closed" puts them at opposite ends of their 
 
 ## micro-ROS devices
 
-`micro_ros_agent` is started as `micro_ros_agent udp4 -p 8888 -v6`. It bridges microcontroller clients on the network into the ROS 2 graph. From the topics the robot uses, those clients are:
+`micro_ros_agent` is started as `micro_ros_agent udp4 -p 8888 -v6` (by the launch file) or by hand as `micro_ros_agent udp4 --port 8888 --dev 192.168.8.138`. `192.168.8.138` is presumably the Jetson's address on the robot network, and it is the agent IP the microcontroller clients must be set to. It bridges microcontroller clients on the network into the ROS 2 graph. From the topics the robot uses, those clients are:
 
 - **Bin sensors / call buttons** publish `std_msgs/Int32` on `/bin_full_id`. The value is `51 + bin_index` (see [robot_nav](packages.md#robot_nav)). The subscriber uses **best-effort** QoS, which matches the default for micro-ROS publishers.
 - **Collection unit (CU)**: `manipulator_control` has a publisher for `std_msgs/Int32` on `/cu_cmd` (1 = open, 0 = close). The calls are commented out right now, so the CU is never commanded.

@@ -81,7 +81,7 @@ ros2 run tag_follower_pkg tag_follower
 ros2 run manipulator_control manipulator_control
 ```
 
-See [Operation](docs/operation.md) for the full procedure and the safety checks to run first.
+See [Operation](docs/operation.md) for the full procedure and the safety checks to run first. The hand-started field sequence (`read_write_node` → `manipulator_control` → `micro_ros_agent` → `tag_follower` → `robot_localization_launch`) is explained command by command in [Operation §5](docs/operation.md#5-field-bring-up-the-five-terminal-sequence).
 
 ## Repository layout
 
